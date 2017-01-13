@@ -1,0 +1,64 @@
+<html>
+    <script type="text/javascript">
+    var canvas, canvasContext, drawActive = false,
+        prevX = 0,
+        currX = 0,
+        prevY = 0,
+        currY = 0,
+        coordinateHistory=[];
+
+    function init() {
+        canvas = document.getElementById('can');
+        canvasContext = canvas.getContext("2d");
+
+        canvas.addEventListener("mousemove", function (e) {
+            findxy('move', e)
+        }, false);
+        canvas.addEventListener("mousedown", function (e) {
+            findxy('down', e)
+        }, false);
+        canvas.addEventListener("mouseup", function (e) {
+            findxy('up', e)
+        }, false);
+        canvas.addEventListener("mouseout", function (e) {
+            findxy('out', e)
+        }, false);
+    }
+
+    function draw() {
+        canvasContext.beginPath();
+        canvasContext.moveTo(prevX, prevY);
+        canvasContext.lineTo(currX, currY);
+        canvasContext.strokeStyle = "#000";
+        canvasContext.lineWidth = 2;
+        canvasContext.stroke();
+        canvasContext.closePath();
+        coordinateHistory.push([currX,currY]);
+    }
+
+    function findxy(res, e) {
+        if (res == 'down') {
+            prevX = currX;
+            prevY = currY;
+            currX = e.clientX - canvas.offsetLeft;
+            currY = e.clientY - canvas.offsetTop;
+            drawActive = true;
+        }
+        if (res == 'up' || res == "out") {
+          drawActive = false;
+        }
+        if (res == 'move') {
+            if (drawActive) {
+                prevX = currX;
+                prevY = currY;
+                currX = e.clientX - canvas.offsetLeft;
+                currY = e.clientY - canvas.offsetTop;
+                draw();
+            }
+        }
+    }
+    </script>
+    <body onload="init()">
+        <canvas id="can" width="400" height="400" style="position:absolute;top:10%;left:10%;border:2px solid;"></canvas>
+    </body>
+    </html>
