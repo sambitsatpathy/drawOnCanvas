@@ -37,33 +37,32 @@
         coordinateHistory.push({x:currX,y:currY});
     }
     function findVertices(){
-      var m=null;
-      for(var i = 0; i< coordinateHistory.length-1;i++){
-        if(m){
-          var tempM=(coordinateHistory[i].y-vertices[vertices.length-1].y)/(coordinateHistory[i].x-vertices[vertices.length-1].x);
-          if(tempM !== m){
-            m=null;
-          }
-        }
+      var m1,m2;
+      vertices.push(coordinateHistory[0]);
+      for(var i = 1; i< coordinateHistory.length-1;i++){
+        m1=(coordinateHistory[i+1].y-coordinateHistory[i].y)/(coordinateHistory[i+1].x-coordinateHistory[i].x);
+        m2=(coordinateHistory[i].y-coordinateHistory[i-1].y)/(coordinateHistory[i].x-coordinateHistory[i-1].x);
 
-        if(!m){
-          m=(coordinateHistory[i+1].y-coordinateHistory[i].y)/(coordinateHistory[i+1].x-coordinateHistory[i].x);
-          vertices.push({m:m,v:coordinateHistory[i]});
+        if((+Math.atan(m2).toFixed(2) - +Math.atan(m1).toFixed(2)) >= 0.17 ){
+          vertices.push(coordinateHistory[i]);
         }
       }
-      var str="<div>Vertex 1: ("+vertices[0].v.x+", "+(400-vertices[0].v.y)+")</div>";
-      var count =1;
-      for(var i =1; i< vertices.length-1 ; i+=2){
-        if((Math.atan(vertices[i+1].m) - Math.atan(vertices[i].m)) >= 0.17 ){ // 10degs
-          count++;
-          str+="<div>Vertex "+ (count) +": ("+vertices[i].v.x+", "+(400-vertices[i].v.y)+")</div>";
-        }
-      }
-      if(count!==3){
-        str="Please draw a triangle with straighter and non overlapping lines, with angle between the vertices being atleast 10 degs."+str;
-        console.error(count + " points got plotted.")
-      }
-      document.querySelector('#result').innerHTML= str;
+vertices[3]=coordinateHistory[0];
+document.querySelector("#can").width=document.querySelector("#can").width;
+
+var str="";
+for(var i=0; i< 3;i++){
+  if(i!=3)
+  str+="<div>Vertex "+ (i+1) +": ("+vertices[i].x+", "+(400-vertices[i].y)+")</div>";
+  canvasContext.beginPath();
+  canvasContext.moveTo(vertices[i].x,vertices[i].y);
+  canvasContext.lineTo(vertices[i+1].x,vertices[i+1].y);
+  canvasContext.strokeStyle = "#000";
+  canvasContext.lineWidth = 2;
+  canvasContext.stroke();
+  canvasContext.closePath();
+}
+  document.querySelector('#result').innerHTML= str;
     }
     function findxy(res, e) {
         if (res == 'down') {
